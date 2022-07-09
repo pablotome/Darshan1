@@ -1,0 +1,5 @@
+4 locales distintos
+son independientes
+cada uno tiene su stock
+N empleados por local
+usuario asociado al local
