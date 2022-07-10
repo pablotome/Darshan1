@@ -1,6 +1,6 @@
 const { mongo } = require("mongoose");
 const Product = require("../models/productModel");
-const errorHandler = require("../utils/errorhandler");
+const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const ApiFeatures = require("../utils/apifeatures");
 
@@ -21,7 +21,7 @@ exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
   let product = await Product.findOne({ _id: ObjectId(req.params.id) });
 
   if (!product) {
-    return next(new errorHandler("Producto no encontrado", 404));
+    return next(new ErrorHandler("Producto no encontrado", 404));
   }
 
   product = await Product.findOneAndUpdate(req.params.id, req.body, {
@@ -45,7 +45,7 @@ exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
   //console.log(`Producto a eliminar: ${req.params.id} - ${product}`);
 
   if (!product) {
-    return next(new errorHandler("Producto no encontrado", 404));
+    return next(new ErrorHandler("Producto no encontrado", 404));
   }
 
   await Product.findOneAndRemove({ _id: req.params.id });
@@ -58,8 +58,9 @@ exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-exports.getAllProducts = catchAsyncErrors(async (req, res) => {
-  const resultPerPage = 5;
+exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
+  //return next(new ErrorHandler("Este es un error", 500));
+  const resultPerPage = 8;
   const productCount = await Product.countDocuments();
   const apiFeatures = new ApiFeatures(Product.find(), req.query)
     .search()
@@ -76,7 +77,7 @@ exports.getProductDetails = catchAsyncErrors(async (req, res, next) => {
   });
 
   if (!product) {
-    return next(new errorHandler("Producto no encontrado", 404));
+    return next(new ErrorHandler("Producto no encontrado", 404));
   }
 
   res.status(200).json({ success: true, product, productCount });
@@ -129,7 +130,7 @@ exports.getProductReviews = catchAsyncErrors(async (req, res, next) => {
   const product = await Product.findById(req.query.productId);
 
   if (!product) {
-    return next(new errorHandler("Producto no encontrado", 404));
+    return next(new ErrorHandler("Producto no encontrado", 404));
   }
 
   res.status(200).json({ success: true, reviews: product.reviews });
@@ -140,7 +141,7 @@ exports.deleteReview = catchAsyncErrors(async (req, res, next) => {
   const product = await Product.findById(req.query.productId);
 
   if (!product) {
-    return next(new errorHandler("Producto no encontrado", 404));
+    return next(new ErrorHandler("Producto no encontrado", 404));
   }
 
   const review = product.reviews.filter(
